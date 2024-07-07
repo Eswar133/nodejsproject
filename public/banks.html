@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Banks</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            border-radius: 8px;
+        }
+        h1 {
+            font-size: 36px;
+            color: #007bff;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        table {
+            background-color: #ffffff;
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #dee2e6;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #007bff;
+            color: #ffffff;
+        }
+        tbody tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Banks</h1>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                </tr>
+            </thead>
+            <tbody id="banks-table-body">
+                <!-- Data will be injected here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            fetch('/api/banks')
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.getElementById('banks-table-body');
+                    data.forEach(bank => {
+                        const row = document.createElement('tr');
+                        const cell = document.createElement('td');
+                        cell.textContent = bank.name;
+                        row.appendChild(cell);
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Error fetching bank data:', error));
+        });
+    </script>
+</body>
+</html>

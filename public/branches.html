@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Branches</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            border-radius: 8px;
+        }
+        h1 {
+            font-size: 36px;
+            color: #007bff;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        table {
+            background-color: #ffffff;
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #dee2e6;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #007bff;
+            color: #ffffff;
+        }
+        tbody tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .pagination {
+            justify-content: center;
+        }
+        .page-link {
+            color: #007bff;
+        }
+        .page-link:hover {
+            text-decoration: none;
+            background-color: #e9ecef;
+        }
+        .page-item.disabled .page-link {
+            color: #6c757d;
+            pointer-events: none;
+            cursor: not-allowed;
+            background-color: #ffffff;
+            border-color: #dee2e6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Branches</h1>
+        <div id="total-count" class="mb-3"></div>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>IFSC</th>
+                    <th>Bank ID</th>
+                    <th>Bank Name</th>
+                    <th>Branch</th>
+                    <th>Address</th>
+                    <th>City</th>
+                    <th>District</th>
+                    <th>State</th>
+                </tr>
+            </thead>
+            <tbody id="branches-table-body">
+                <!-- Data will be injected here -->
+            </tbody>
+        </table>
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                <li class="page-item">
+                    <a class="page-link" href="#" id="previous-page" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="#" id="next-page" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            let currentPage = 1;
+            const perPage = 10;
+
+            function fetchBranches(page) {
+                fetch(`/api/branch?page=${page}&per_page=${perPage}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const tableBody = document.getElementById('branches-table-body');
+                        tableBody.innerHTML = '';
+                        data.results.forEach(branch => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${branch.ifsc}</td>
+                                <td>${branch.bank_id}</td>
+                                <td>${branch.bank_name}</td>
+                                <td>${branch.branch}</td>
+                                <td>${branch.address}</td>
+                                <td>${branch.city}</td>
+                                <td>${branch.district}</td>
+                                <td>${branch.state}</td>
+                            `;
+                            tableBody.appendChild(row);
+                        });
+
+                        document.getElementById('total-count').textContent = `Total branches: ${data.total_count}`;
+                        document.getElementById('previous-page').parentElement.classList.toggle('disabled', !data.previous);
+                        document.getElementById('next-page').parentElement.classList.toggle('disabled', !data.next);
+                    })
+                    .catch(error => console.error('Error fetching branches:', error));
+            }
+
+            document.getElementById('previous-page').addEventListener('click', function (event) {
+                event.preventDefault();
+                if (currentPage > 1) {
+                    currentPage--;
+                    fetchBranches(currentPage);
+                }
+            });
+
+            document.getElementById('next-page').addEventListener('click', function (event) {
+                event.preventDefault();
+                currentPage++;
+                fetchBranches(currentPage);
+            });
+
+            // Initial fetch
+            fetchBranches(currentPage);
+        });
+    </script>
+</body>
+</html>
